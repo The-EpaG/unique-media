@@ -1,12 +1,13 @@
 from PIL import Image
 import io
 
+import imagehash
+
 from util.state_manager import StateManager
 
 
 DESTINATION_FOLDER = 'out/'
 STEP = 2
-SCALE = 128, 128
 
 def should_i_start(status_manager:StateManager):
     if not status_manager.should_i_start(STEP):
@@ -17,17 +18,11 @@ def should_i_start(status_manager:StateManager):
 
     return True
 
-def scale_image(image_path):
+def phash(image_path):
     img = Image.open(image_path)
-    img.thumbnail(SCALE, Image.Resampling.LANCZOS)
-    
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='PNG')
-    img_byte_arr = img_byte_arr.getvalue()
+    return imagehash.phash(img)
 
-    return img_byte_arr
-
-def not_equal(image1, image2):
+def print_equal(image1, image2):
     print(f"This images are equal: {image1} and {image2}")
 
 def main():
@@ -42,20 +37,16 @@ def main():
 
     for extension in extensions:
 
-        unique_image = {
-            "path": [],
-            "image": []
-        }
+        unique_image = {}
 
         for image in status[extension]:
-            scaled_image = scale_image(image)
+            hashed_image = phash(image)
 
-            if scaled_image not in unique_image["image"]:
-                unique_image["path"].append(image)
-                unique_image["image"].append(scaled_image)
+            if hashed_image not in unique_image.keys():
+                unique_image[hashed_image] = (image)
                 continue
 
-            not_equal(image, unique_image["path"].pop(unique_image["image"].index(scaled_image)))
+            print_equal(image, unique_image[hashed_image])
             found_images_equal = True
     
     if found_images_equal:

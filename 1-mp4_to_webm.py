@@ -17,7 +17,7 @@ def mkdir_if_not_exists(path):
 def mp4_to_webm(input_file, output_file):
     video = VideoFileClip(input_file)
     output_file = output_file.replace('.mp4', '.webm')
-    video.write_videofile(output_file, codec="libvpx", audio_codec="libvorbis")
+    video.write_videofile(output_file, codec="libvpx", audio_codec="libvorbis", threads=16)
     return output_file
 
 def main():
