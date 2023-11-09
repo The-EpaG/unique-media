@@ -1,8 +1,4 @@
-from PIL import Image
-import io
-
-import imagehash
-
+from util.image_hash_manager import ImageHashManager
 from util.state_manager import StateManager
 
 
@@ -13,17 +9,13 @@ def should_i_start(status_manager:StateManager):
     if not status_manager.should_i_start(STEP):
         return False
 
-    if "png" not in status_manager.get_state() or "jpg" not in status_manager.get_state():
+    if "png" not in status_manager.get_state() and "jpg" not in status_manager.get_state():
         return False
 
     return True
 
-def phash(image_path):
-    img = Image.open(image_path)
-    return imagehash.phash(img)
-
-def print_equal(image1, image2):
-    print(f"This images are equal: {image1} and {image2}")
+def print_equal(images: list[str]):
+    print(f"This images are equal: {images}")
 
 def main():
     status_manager = StateManager()
@@ -36,18 +28,14 @@ def main():
     found_images_equal = False
 
     for extension in extensions:
+        if extension not in status:
+            continue
 
-        unique_image = {}
-
-        for image in status[extension]:
-            hashed_image = phash(image)
-
-            if hashed_image not in unique_image.keys():
-                unique_image[hashed_image] = (image)
-                continue
-
-            print_equal(image, unique_image[hashed_image])
+        hashed_images = ImageHashManager.get_equals_images(status[extension])
+        
+        for conflict_image in hashed_images.values():
             found_images_equal = True
+            print_equal(conflict_image)
     
     if found_images_equal:
         exit(1)
