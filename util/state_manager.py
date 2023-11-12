@@ -1,7 +1,7 @@
 import json
 import os
-from util.const import JSON_FILE
 
+from util.const import JSON_FILE
 from util.state import State
 
 class StateManager:
@@ -29,11 +29,9 @@ class StateManager:
     def _set_step(self, step:int) -> None:
         self.state.step = step
 
-    def should_i_start(self, step:int, should_exist=True) -> bool:
-        if should_exist and not os.path.exists(JSON_FILE):
-            return False
-
-        if not should_exist and os.path.exists(JSON_FILE):
+    def should_start(self, step:int, should_exist=True) -> bool:
+        if (should_exist and not os.path.exists(JSON_FILE)) or \
+           (not should_exist and os.path.exists(JSON_FILE)):
             return False
         
         should_continue = self._get_step() < step

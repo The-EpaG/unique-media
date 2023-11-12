@@ -7,8 +7,8 @@ from util.state_manager import StateManager
 
 STEP = 0
 
-def should_i_start(status_manager:StateManager):
-    return status_manager.should_i_start(STEP, should_exist=False)
+def should_start(status_manager:StateManager):
+    return status_manager.should_start(STEP, should_exist=False)
 
 def mkdir_if_not_exists(path):
     if not os.path.exists(path):
@@ -24,8 +24,10 @@ def main():
     status_manager = StateManager()
     status = status_manager.get_state()
 
-    if not should_i_start(status_manager):
+    if not should_start(status_manager):
         exit(0)
+    
+    mkdir_if_not_exists(DESTINATION_FOLDER)
 
     for root, dirs, files in os.walk(SOURCE_FOLDER):
         for file_name in files:
